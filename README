@@ -1,0 +1,29 @@
+This is a GNURadio module to get complex samples from an Agilent E4406A VSA
+
+You need the libvxi11 library to be installed in your system. See:
+https://github.com/f4exb/libvxi11
+
+The Gnu Radio block requires a recent gnuradio (>= v3.7) to be installed.
+
+Before building the block you have to make sure that all the dependencies
+(see list of supported devices above) you are intend to work with are
+properly installed. The build system of gr-osmosdr will recognize them and
+enable specific source/sink components thereafter.
+
+Please note: prior pulling a new version from git and compiling it,
+please do a "make uninstall" first to properly remove the previous version.
+
+Building with cmake:
+
+git clone https://github.com/f4exb/gr-e4406a
+cd gr-e4406a
+mkdir build
+cd build/
+cmake ../
+make
+sudo make install
+sudo ldconfig
+
+See INSTALL for a more exotic cmake command involving custom locations for libvxi11 and GNURadio
+
+

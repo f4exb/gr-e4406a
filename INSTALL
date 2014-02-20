@@ -1,0 +1,1 @@
+cmake /shared/development/github/gr-e4406a -DLIBVXI11_LIBRARIES=/opt/install/libvxi11/lib/libvxi11.so -DLIBVXI11_INCLUDE_DIRS=/opt/install/libvxi11/include -DGNURADIO_RUNTIME_LIBRARIES=/opt/install/gnuradio-3.7.2/lib/libgnuradio-runtime.so -DGNURADIO_RUNTIME_INCLUDE_DIRS=/opt/install/gnuradio-3.7.2/include -DCMAKE_INSTALL_PREFIX:PATH=/opt/install/gnuradio-3.7.2
