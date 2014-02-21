@@ -22,6 +22,8 @@
 #define INCLUDED_E4406A_E4406A_SOURCE_IMPL_H
 
 #include <e4406a/E4406A_source.h>
+#include <string>
+#include <inttypes.h>
 #include "vxi11_user.h"
 
 namespace gr {
@@ -40,7 +42,7 @@ public:
     * \param resbw Resolution bandwidth in Hz
     * \param nb_points Number of I/Q points per E4406A block
     */
-    E4406A_source_impl(const char *ip_addr, unsigned long int frequency, unsigned int resbw, unsigned int nb_points);
+    E4406A_source_impl(const std::string& ip_addr, uint64_t frequency, uint32_t resbw, uint32_t nb_points);
     
     /**
      * Destructor
@@ -60,29 +62,38 @@ protected:
     unsigned long int d_frequency; //!< Center frequency in Hz
     unsigned int d_resbw;          //!< Resolution bandwidth in Hz
     unsigned int d_nb_points;      //!< Number of I/Q points per E4406A block
-    char  *d_ip_addr;               //!< E4406A IP Address
-    CLINK d_vxi_link;                //!< VXI-11 instrument handler
+    std::string d_ip_addr;          //!< E4406A IP Address
+    CLINK  d_vxi_link;             //!< VXI-11 instrument handler
+    char   *d_e4406a_buf;          //!< Buffer for I/Q data block returned by E4406A
+    size_t d_e4406a_bufsize;       //!< Size of buffer used for wave data retrieval from E4406A (:READ:WAV0?)
+    size_t d_e4406a_bufsize_iq;    //!< Size of buffer for I/Q data block returned by E4406A
+
+    /**
+     * Send command without argument to instrument utility
+     * \param command Command 
+     */
+    void send_command(const char *command);
 
     /**
      * Send command with double argument to instrument utility
-     * \parm command Command fixed part (prefix)
-     * \parm value Argument as floating point with double precision value
+     * \param command Command fixed part (prefix)
+     * \param value Argument as floating point with double precision value
      */
-    int send_command_double(const char *command, double value);
+    void send_command_double(const char *command, double value);
 
     /**
      * Send command with unsigned integer argument to instrument utility
-     * \parm command Command fixed part (prefix)
-     * \parm value Argument as unsigned integer point value
+     * \param command Command fixed part (prefix)
+     * \param value Argument as unsigned integer point value
      */
-    int send_command_u(const char *command, unsigned int value);
+    void send_command_u(const char *command, unsigned int value);
 
     /**
      * Send command with unsigned long integer argument to instrument utility
-     * \parm command Command fixed part (prefix)
-     * \parm value Argument as unsigned long integer point value
+     * \param command Command fixed part (prefix)
+     * \param value Argument as unsigned long integer point value
      */
-    int send_command_ul(const char *command, unsigned long int value);
+    void send_command_ul(const char *command, unsigned long int value);
 };
 
 } // namespace e4406a

@@ -29,7 +29,6 @@ include_directories(
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
-    ${LIBVXI11_LIBRARIES}
 )
 
 list(APPEND e4406a_sources
@@ -37,7 +36,7 @@ list(APPEND e4406a_sources
 )
 
 add_library(gnuradio-e4406a SHARED ${e4406a_sources})
-target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES})
+target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${LIBVXI11_LIBRARIES})
 set_target_properties(gnuradio-e4406a PROPERTIES DEFINE_SYMBOL "gnuradio_e4406a_EXPORTS")
 
 ########################################################################

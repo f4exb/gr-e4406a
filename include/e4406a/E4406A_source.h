@@ -22,6 +22,7 @@
 #ifndef INCLUDED_E4406A_E4406A_SOURCE_H
 #define INCLUDED_E4406A_E4406A_SOURCE_H
 
+#include <inttypes.h>
 #include <e4406a/api.h>
 #include <gnuradio/sync_block.h>
 
@@ -51,7 +52,7 @@ public:
     * \param resbw Resolution bandwidth in Hz
     * \param nb_points Number of I/Q points per E4406A block
     */
-    static sptr make(const char *ip_addr, unsigned long int frequency, unsigned int resbw, unsigned int nb_points);
+    static sptr make(const std::string& ip_addr, uint64_t frequency, uint32_t resbw, uint32_t nb_points);
 };
 
 } // namespace e4406a

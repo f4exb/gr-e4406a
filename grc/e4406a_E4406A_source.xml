@@ -1,38 +1,40 @@
 <?xml version="1.0"?>
+<!--
+###################################################
+## E4406A Source
+###################################################
+ -->
 <block>
-  <name>E4406A_source</name>
-  <key>e4406a_E4406A_source</key>
-  <category>e4406a</category>
-  <import>import e4406a</import>
-  <make>e4406a.E4406A_source()</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
-  <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
-  </param>
-
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
-  <sink>
-    <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
-  </sink>
-
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
-  <source>
-    <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
-  </source>
+    <name>E4406A source</name>
+    <key>e4406a_E4406A_source</key>
+    <category>E4406A</category>
+    <import>import e4406a</import>
+    <make>e4406a.E4406A_source($ip_addr, $intfrequency, $resbw, $nb_points)</make>
+    <param>
+        <name>ip_addr</name>
+        <key>ip_addr</key>
+        <type>string</type>
+    </param>
+    <param>
+        <name>Intfrequency</name>
+        <key>intfrequency</key>
+        <value>1000000000</value>
+        <type>int</type>
+    </param>
+    <param>
+        <name>Resbw</name>
+        <key>resbw</key>
+        <value>8000000</value>
+        <type>int</type>
+    </param>
+    <param>
+        <name>Nb_points</name>
+        <key>nb_points</key>
+        <value>4096</value>
+        <type>int</type>
+    </param>
+    <source>
+        <name>out</name>
+        <type>complex</type>
+    </source>
 </block>

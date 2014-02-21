@@ -2,7 +2,8 @@
 
 #define E4406A_API
 
-%include "gnuradio.i"			// the common stuff
+%include <stdint.i>   // the inttypes for uint64_t, uint32_t
+%include "gnuradio.i" // the common stuff
 
 //load generated python docstrings
 %include "e4406a_swig_doc.i"
