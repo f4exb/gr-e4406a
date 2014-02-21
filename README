@@ -21,6 +21,6 @@ sudo ldconfig
 
 See INSTALL for a more exotic cmake command involving custom locations for 
 libvxi11 and GNURadio. You do not need to install with sudo if this is in a 
-location your user has access (this is my preferred solution). 
+location your user has access to (this is my preferred solution). 
 
 
