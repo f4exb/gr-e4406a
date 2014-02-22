@@ -30,20 +30,29 @@ namespace gr {
 namespace e4406a { 
 
 // ================================================================================================
-E4406A_source::sptr E4406A_source::make(const std::string& ip_addr, uint64_t frequency, uint32_t resbw, uint32_t nb_points)
+E4406A_source::sptr E4406A_source::make(const std::string& ip_addr, 
+                                                float frequency, 
+                                                float resbw, 
+                                                uint32_t nb_points,
+                                                float rfgain)
 {
-    return gnuradio::get_initial_sptr(new E4406A_source_impl(ip_addr, frequency, resbw, nb_points));
+    return gnuradio::get_initial_sptr(new E4406A_source_impl(ip_addr, frequency, resbw, nb_points, rfgain));
 }
 
 // ================================================================================================
-E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr, uint64_t frequency, uint32_t resbw, uint32_t nb_points) 
+E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr, 
+                                                float frequency, 
+                                                float resbw, 
+                                                uint32_t nb_points,
+                                                float rfgain) 
   : gr::sync_block("E4406A_source",
             gr::io_signature::make(0, 0, 0),
             gr::io_signature::make(1, 1, sizeof(gr_complex))),
     d_frequency(frequency),
     d_resbw(resbw),
     d_nb_points(nb_points),
-    d_ip_addr(ip_addr)
+    d_ip_addr(ip_addr),
+    d_rfgain(rfgain)
 {
     const size_t MAXSIZE = 256;
     char rcv[MAXSIZE];
@@ -62,27 +71,10 @@ E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr, uint64_t freq
     send_command(":SYST:MESS \"In Use by GNU Radio - front panel disabled\""); // send informatory message to E4406A status line
     send_command(":DISP:ENAB 0"); // inhibit display
     
-    send_command_ul(":FREQ:CENT", d_frequency); // set central frequency
-    send_command_u(":WAV:BWID", d_resbw);       // set resolution bandwidth
-    
-    send_command(":WAV:APER?");
-    int bytes_returned = vxi11_receive(&d_vxi_link, rcv, MAXSIZE);
-    
-    if (bytes_returned > 0)
-    {
-        rcv[bytes_returned] = '\0';
-    }
-    else
-    {
-        std::cerr << "E4406A: cannot get effective sample rate" << std::endl;
-        throw std::runtime_error("cannot get effective sample rate");
-    }
-    
-    double samp_rate;
-    sscanf(rcv, "%lf", &samp_rate);
-    double sweep_time = samp_rate * (d_nb_points - 1);
-    
-    send_command_double(":WAV:SWE:TIME", sweep_time); // set sweep time according to requested I/Q block size
+    set_frequency(d_frequency); // set central frequency
+    set_bandwidth_and_sweep_time(); // set resolution bandwidth and sweep time
+    set_rfgain(d_rfgain); // set RF Gain
+
     gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of E4406A I/Q block size
     
     d_e4406a_bufsize_iq = d_nb_points*8;              // I/Q samples buffer size
@@ -112,17 +104,15 @@ int E4406A_source_impl::work(int noutput_items,
 
     // Fetch data from E4406A and do signal processing
     
-    send_command(":READ:WAV0?");
-    int bytes_returned_i = vxi11_receive(&d_vxi_link, d_e4406a_buf, d_e4406a_bufsize);
+    size_t bytes_returned = send_command_and_get_response(":READ:WAV0?", d_e4406a_buf, d_e4406a_bufsize);
     
-    if (bytes_returned_i < 2)
+    if (bytes_returned < 2)
     {
-        std::cerr << "E4406A: I/Q data size less than 2 bytes (" << bytes_returned_i << " bytes)" << std::endl;
+        std::cerr << "E4406A: I/Q data size less than 2 bytes (" << bytes_returned << " bytes)" << std::endl;
         throw std::runtime_error("invalid size for I/Q data");
     }
     else
     {
-        unsigned int bytes_returned = bytes_returned_i;
         char counter_str[8];
         
         if (d_e4406a_buf[0] != '#')
@@ -180,12 +170,18 @@ int E4406A_source_impl::work(int noutput_items,
 // ================================================================================================
 void E4406A_source_impl::send_command(const char *command)
 {
-    if (vxi11_send(&d_vxi_link, command) < 0)
+    int ret;
+    
     {
-        std::cerr << "E4406A: cannot send command (" << command << ")" << std::endl;
-        throw std::runtime_error("cannot send command to E4406A");
+        gr::thread::scoped_lock guard(d_e4406a_mutex); // protect communication with E4406A
+        ret = vxi11_send(&d_vxi_link, command);
     }
     
+    if (ret < 0)
+    {
+        std::cerr << "E4406A: cannot send command \"" << command << "\"" << std::endl;
+        throw std::runtime_error("cannot send command to E4406A");
+    }    
 }
 
 // ================================================================================================
@@ -193,12 +189,7 @@ void E4406A_source_impl::send_command_double(const char *command, double value)
 {    char cmd[64];
     
     sprintf(cmd, "%s %.6lf", command, value);
-    
-    if (vxi11_send(&d_vxi_link, cmd) < 0)
-    {
-        std::cerr << "E4406A: cannot send command with double argument (" << cmd << ")" << std::endl;
-        throw std::runtime_error("cannot send command to E4406A");
-    }
+    send_command(cmd);
 }
 
 // ================================================================================================
@@ -207,12 +198,7 @@ void E4406A_source_impl::send_command_u(const char *command, unsigned int value)
     char cmd[64];
     
     sprintf(cmd, "%s %u", command, value);
-    
-    if (vxi11_send(&d_vxi_link, cmd) < 0)
-    {
-        std::cerr << "E4406A: cannot send command with unsigned int argument (" << cmd << ")" << std::endl;
-        throw std::runtime_error("cannot send command to E4406A");
-    }
+    send_command(cmd);
 }
 
 // ================================================================================================
@@ -221,12 +207,107 @@ void E4406A_source_impl::send_command_ul(const char *command, unsigned long int 
     char cmd[64];
     
     sprintf(cmd, "%s %lu", command, value);
+    send_command(cmd);
+}
+
+// ================================================================================================
+size_t E4406A_source_impl::send_command_and_get_response(const char *command, char *buf, const size_t bufsize)
+{
+    int ret, bytes_returned;
     
-    if (vxi11_send(&d_vxi_link, cmd) < 0)
     {
-        std::cerr << "E4406A: cannot send command with unsigned long int argument (" << cmd << ")" << std::endl;
+        gr::thread::scoped_lock guard(d_e4406a_mutex); // protect communication with E4406A
+        ret = vxi11_send(&d_vxi_link, command);
+        bytes_returned = vxi11_receive(&d_vxi_link, buf, bufsize);
+    }
+    
+    if (ret < 0)
+    {
+        std::cerr << "E4406A: cannot send command \"" << command << "\"" << std::endl;
         throw std::runtime_error("cannot send command to E4406A");
     }
+    else if (bytes_returned > 0)
+    {
+        return bytes_returned;
+    }
+    else
+    {
+        std::cerr << "E4406A: no reply to command \"" << command << "\"" << std::endl;
+        throw std::runtime_error("cannot get reply from E4406A");
+    }    
+}
+
+// ================================================================================================
+void E4406A_source_impl::send_command_and_get_response_double(const char *command, double *value)
+{
+    const size_t rcvsize = 64;
+    char rcv[rcvsize];
+    
+    size_t bytes_returned = send_command_and_get_response(command, rcv, rcvsize);
+    rcv[bytes_returned] = '\0';
+    sscanf(rcv, "%lf", value);
+}
+
+// ================================================================================================
+void E4406A_source_impl::set_bandwidth_and_sweep_time()
+{
+    double value_d;
+    
+    send_command_u(":WAV:BWID", d_resbw); // set resolution bandwidth
+    send_command_and_get_response_double(":WAV:BWID?", &value_d);
+    d_resbw = value_d; // update with value as set by the instrument
+    std::cout << std::endl;
+    std::cout << "E4406A: Resolution BW " << d_resbw << " Hz" << std::endl;
+    
+    send_command_and_get_response_double(":WAV:APER?", &d_samp_rate);
+    d_sweep_time = d_samp_rate * (d_nb_points - 1);
+    std::cout << "E4406A: Effective sample rate " << d_samp_rate << " s" << std::endl;
+    std::cout << "E4406A: Sweep time set to " << d_sweep_time << " s" << std::endl;
+    
+    send_command_double(":WAV:SWE:TIME", d_sweep_time); // set sweep time according to requested I/Q block size
+}
+
+// ================================================================================================
+void E4406A_source_impl::set_frequency(float frequency)
+{
+    double e4406a_freq;
+    
+    d_frequency = frequency;
+    send_command_ul(":FREQ:CENT", d_frequency); // set central frequency
+    send_command_and_get_response_double(":FREQ:CENT?", &e4406a_freq); 
+    d_frequency = e4406a_freq; // update with frequency as set by the E4406A
+}
+
+// ================================================================================================
+void E4406A_source_impl::set_resbw(float resbw)
+{
+    d_resbw = resbw;
+    set_bandwidth_and_sweep_time();
+}
+
+// ================================================================================================
+void E4406A_source_impl::set_rfgain(float rfgain)
+{
+    d_rfgain = rfgain;
+    send_command_double(":CORR:LOSS", -d_rfgain);
+}
+
+// ================================================================================================
+float E4406A_source_impl::get_resbw_ratio()
+{
+    return d_resbw * d_samp_rate;
+}
+
+// ================================================================================================
+float E4406A_source_impl::get_sweep_time()
+{
+    return d_sweep_time;
+}
+
+// ================================================================================================
+float E4406A_source_impl::get_samp_rate()
+{
+    return d_samp_rate;
 }
 
 } /* namespace e4406a */

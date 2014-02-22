@@ -9,7 +9,10 @@
     <key>e4406a_E4406A_source</key>
     <category>E4406A</category>
     <import>import e4406a</import>
-    <make>e4406a.E4406A_source($ip_addr, $intfrequency, $resbw, $nb_points)</make>
+    <make>e4406a.E4406A_source($ip_addr, $intfrequency, $resbw, $nb_points, $rfgain)</make>
+    <callback>set_frequency($intfrequency)</callback>
+    <callback>set_resbw($resbw)</callback>
+    <callback>set_rfgain($rfgain)</callback>
     <param>
         <name>ip_addr</name>
         <key>ip_addr</key>
@@ -18,20 +21,26 @@
     <param>
         <name>Intfrequency</name>
         <key>intfrequency</key>
-        <value>1000000000</value>
-        <type>int</type>
+        <value>1e9</value>
+        <type>float</type>
     </param>
     <param>
         <name>Resbw</name>
         <key>resbw</key>
-        <value>8000000</value>
-        <type>int</type>
+        <value>8e6</value>
+        <type>float</type>
     </param>
     <param>
         <name>Nb_points</name>
         <key>nb_points</key>
         <value>4096</value>
         <type>int</type>
+    </param>
+    <param>
+        <name>RF_gain</name>
+        <key>rfgain</key>
+        <value>0</value>
+        <type>float</type>
     </param>
     <source>
         <name>out</name>
