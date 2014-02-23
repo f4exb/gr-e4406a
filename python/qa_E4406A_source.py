@@ -45,10 +45,6 @@ class qa_E4406A_source (gr_unittest.TestCase):
 
         print "# result I/Q points:", len(result_data) 
 
-        for result_point in result_data:
-            if result_point != 0:
-                print result_point
-
         self.assertEqual(len(result_data), 4096)
 
 if __name__ == '__main__':

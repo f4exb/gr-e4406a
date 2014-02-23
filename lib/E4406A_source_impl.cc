@@ -24,6 +24,7 @@
 
 #include <gnuradio/io_signature.h>
 #include <cstdlib>
+#include <cmath>
 #include "E4406A_source_impl.h"
 
 namespace gr {
@@ -77,8 +78,8 @@ E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr,
 
     gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of E4406A I/Q block size
     
-    d_e4406a_bufsize_iq = d_nb_points*8;              // I/Q samples buffer size
-    d_e4406a_bufsize = d_e4406a_bufsize_iq + 16;      // waveform buffer size to dialog with E4406A
+    d_e4406a_bufsize_iq = d_nb_points*8;               // I/Q samples buffer size
+    d_e4406a_bufsize = d_e4406a_bufsize_iq*2;          // waveform buffer size to dialog with E4406A
     d_e4406a_buf = (char *) malloc(d_e4406a_bufsize); // allocate memory for I/Q block returned by E4406A
 }
 
@@ -145,7 +146,7 @@ int E4406A_source_impl::work(int noutput_items,
             }
             else if (byte_count < d_e4406a_bufsize_iq)
             {
-                std::cerr << "E4406A: I/Q data block too small (" << bytes_returned-2-counter_size << " bytes)" << std::endl;
+                std::cerr << "E4406A: I/Q data block too small: requested " << d_e4406a_bufsize_iq << " bytes, got " << byte_count << std::endl;
                 throw std::runtime_error("invalid size for I/Q data");
             }
             else
@@ -257,14 +258,18 @@ void E4406A_source_impl::set_bandwidth_and_sweep_time()
     send_command_and_get_response_double(":WAV:BWID?", &value_d);
     d_resbw = value_d; // update with value as set by the instrument
     std::cout << std::endl;
-    std::cout << "E4406A: Resolution BW " << d_resbw << " Hz" << std::endl;
     
     send_command_and_get_response_double(":WAV:APER?", &d_samp_rate);
-    d_sweep_time = d_samp_rate * (d_nb_points - 1);
-    std::cout << "E4406A: Effective sample rate " << d_samp_rate << " s" << std::endl;
-    std::cout << "E4406A: Sweep time set to " << d_sweep_time << " s" << std::endl;
+    d_sweep_time = d_samp_rate * (d_nb_points - 1); // add one point to make sure we have enough points in any case
+
+    std::cout << "E4406A: Resolution BW " << d_resbw 
+              << " Hz, RBW ratio " << d_resbw * d_samp_rate 
+              << ", decim " << get_decim() << std::endl;
+    std::cout << "E4406A: Effective sample rate " << d_samp_rate << " s" 
+              << ", Span decimated " << get_decimated_bw() << " Hz" << std::endl;
+    std::cout << "E4406A: Sweep time set to " << d_sweep_time * 1.01 << " s" << std::endl;
     
-    send_command_double(":WAV:SWE:TIME", d_sweep_time); // set sweep time according to requested I/Q block size
+    send_command_double(":WAV:SWE:TIME", d_sweep_time * 1.01); // set sweep time according to requested I/Q block size
 }
 
 // ================================================================================================
@@ -308,6 +313,18 @@ float E4406A_source_impl::get_sweep_time()
 float E4406A_source_impl::get_samp_rate()
 {
     return d_samp_rate;
+}
+
+// ================================================================================================
+int E4406A_source_impl::get_decim()
+{
+    return round(1.0 / (d_resbw * d_samp_rate));
+}
+
+// ================================================================================================
+float E4406A_source_impl::get_decimated_bw()
+{
+    return (1.0 / d_samp_rate) / get_decim();
 }
 
 } /* namespace e4406a */

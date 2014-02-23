@@ -96,6 +96,18 @@ public:
       */
      virtual float get_samp_rate() = 0; 
      
+     /**
+      * Get optimum decimation factor for FFT display
+      * \return Decimation factor
+      */
+     virtual int get_decim() = 0; 
+     
+     /**
+      * Get decimated bandwidth
+      * \return Decimated bandwidth in Hz
+      */
+     virtual float get_decimated_bw() = 0; 
+     
 };
 
 } // namespace e4406a

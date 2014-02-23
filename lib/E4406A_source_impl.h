@@ -86,6 +86,19 @@ public:
       */
      float get_samp_rate(); 
      
+     /**
+      * Get optimum decimation factor for FFT display
+      * \return Decimation factor
+      */
+     int get_decim(); 
+     
+     /**
+      * Get decimated bandwidth
+      * \return Decimated bandwidth in Hz
+      */
+     float get_decimated_bw(); 
+     
+     
     /**
      * Worker
      * \brief Where all the action really happens
