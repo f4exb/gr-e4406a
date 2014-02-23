@@ -10,8 +10,11 @@
 
 %{
 #include "e4406a/E4406A_source.h"
+#include "e4406a/variable_resampler_ccc.h"
 %}
 
 
 %include "e4406a/E4406A_source.h"
+%include "e4406a/variable_resampler_ccc.h"
 GR_SWIG_BLOCK_MAGIC2(e4406a, E4406A_source);
+GR_SWIG_BLOCK_MAGIC2(e4406a, variable_resampler_ccc);

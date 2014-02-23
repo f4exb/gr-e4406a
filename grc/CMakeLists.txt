@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    e4406a_E4406A_source.xml DESTINATION share/gnuradio/grc/blocks
+    e4406a_E4406A_source.xml 
+    e4406a_variable_resampler_ccc.xml DESTINATION share/gnuradio/grc/blocks
 )

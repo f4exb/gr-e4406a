@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+##Variable Resampler 
+###################################################
+ -->
+<block>
+	<name>Variable Resampler</name>
+	<key>e4406a_variable_resampler_ccc</key>
+    <category>E4406A</category>
+	<import>from gnuradio import filter</import>
+	<import>from gnuradio.filter import firdes</import>
+    <import>import e4406a</import>
+	<make>e4406a.variable_resampler_ccc(
+        interpolation=$interp,
+        decimation=$decim,
+        taps=$taps)
+    </make>
+    <callback>set_decim($decim)</callback>
+    <callback>set_interp($interp)</callback>
+    <callback>set_taps($taps)</callback>
+	<param>
+		<name>Interpolation</name>
+		<key>interp</key>
+		<value>1</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Decimation</name>
+		<key>decim</key>
+		<value>1</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Taps</name>
+		<key>taps</key>
+        <value></value>
+		<type>complex_vector</type>
+	</param>
+	<sink>
+		<name>in</name>
+		<type>complex</type>
+	</sink>
+	<source>
+		<name>out</name>
+		<type>complex</type>
+	</source>
+</block>
