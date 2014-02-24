@@ -33,6 +33,7 @@ link_directories(
 
 list(APPEND e4406a_sources
     E4406A_source_impl.cc
+    simple_decimator_cc_impl.cc
 )
 
 add_library(gnuradio-e4406a SHARED ${e4406a_sources})

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+## Simple decimator dynamically sizeable
+###################################################
+ -->
+<block>
+  <name>simple_decimator_cc</name>
+  <key>e4406a_simple_decimator_cc</key>
+  <category>e4406a</category>
+  <import>import e4406a</import>
+  <make>e4406a.simple_decimator_cc($decim)</make>
+  <callback>set_decim($decim)</callback>
+  <param>
+    <name>decim</name>
+    <key>decim</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>

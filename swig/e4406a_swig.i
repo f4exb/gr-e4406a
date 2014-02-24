@@ -10,8 +10,12 @@
 
 %{
 #include "e4406a/E4406A_source.h"
+#include "e4406a/simple_decimator_cc.h"
 %}
 
 
 %include "e4406a/E4406A_source.h"
+%include "e4406a/simple_decimator_cc.h"
+
 GR_SWIG_BLOCK_MAGIC2(e4406a, E4406A_source);
+GR_SWIG_BLOCK_MAGIC2(e4406a, simple_decimator_cc);
