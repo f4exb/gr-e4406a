@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sun Feb 23 20:48:58 2014</timestamp>
+  <timestamp>Mon Feb 24 02:04:58 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -72,7 +72,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2</value>
+      <value>4</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -110,7 +110,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>decim</value>
+      <value>samp_rate</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -118,11 +118,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>decim0</value>
+      <value>4096</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(196, 78)</value>
+      <value>(186, 14)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -133,7 +133,7 @@
     <key>variable</key>
     <param>
       <key>id</key>
-      <value>samp_rate</value>
+      <value>decim</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -141,11 +141,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>8192</value>
+      <value>5</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(186, 14)</value>
+      <value>(196, 78)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -204,38 +204,42 @@
     </param>
   </block>
   <block>
-    <key>variable_function_probe</key>
+    <key>variable_text_box</key>
     <param>
       <key>id</key>
-      <value>decim0</value>
+      <value>freq</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
+      <key>label</key>
+      <value>Freq (Hz)</value>
+    </param>
+    <param>
       <key>value</key>
-      <value>7</value>
+      <value>2.375e9</value>
     </param>
     <param>
-      <key>block_id</key>
-      <value>E4406A_source_0</value>
+      <key>converver</key>
+      <value>float_converter</value>
     </param>
     <param>
-      <key>function_name</key>
-      <value>get_decim</value>
+      <key>formatter</key>
+      <value>None</value>
     </param>
     <param>
-      <key>function_args</key>
+      <key>grid_pos</key>
       <value></value>
     </param>
     <param>
-      <key>poll_rate</key>
-      <value>1</value>
+      <key>notebook</key>
+      <value></value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(859, 5)</value>
+      <value>(425, 11)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -380,7 +384,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>44.5</value>
+      <value>28.5</value>
     </param>
     <param>
       <key>converver</key>
@@ -401,92 +405,6 @@
     <param>
       <key>_coordinate</key>
       <value>(584, 10)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_text_box</key>
-    <param>
-      <key>id</key>
-      <value>freq</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Freq (Hz)</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>925e6</value>
-    </param>
-    <param>
-      <key>converver</key>
-      <value>float_converter</value>
-    </param>
-    <param>
-      <key>formatter</key>
-      <value>None</value>
-    </param>
-    <param>
-      <key>grid_pos</key>
-      <value></value>
-    </param>
-    <param>
-      <key>notebook</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(425, 11)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>e4406a_variable_resampler_ccc</key>
-    <param>
-      <key>id</key>
-      <value>e4406a_variable_resampler_ccc_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>interp</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>decim</key>
-      <value>decim</value>
-    </param>
-    <param>
-      <key>taps</key>
-      <value>firdes.complex_band_pass(1,samp_rate*decim,-samp_rate/2,samp_rate/2,samp_rate/36)</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(538, 173)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -604,7 +522,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>200000</value>
+      <value>1e6</value>
     </param>
     <param>
       <key>converver</key>
@@ -631,6 +549,57 @@
       <value>0</value>
     </param>
   </block>
+  <block>
+    <key>rational_resampler_xxx</key>
+    <param>
+      <key>id</key>
+      <value>rational_resampler_xxx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>ccc</value>
+    </param>
+    <param>
+      <key>interp</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>decim</key>
+      <value>decim</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value>firdes.complex_band_pass(1,samp_rate*decim,-samp_rate/2,samp_rate/2,samp_rate/36)</value>
+    </param>
+    <param>
+      <key>fbw</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(519, 165)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>E4406A_source_0</source_block_id>
     <sink_block_id>blocks_throttle_0</sink_block_id>
@@ -639,18 +608,18 @@
   </connection>
   <connection>
     <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>e4406a_variable_resampler_ccc_0</sink_block_id>
+    <sink_block_id>rational_resampler_xxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>e4406a_variable_resampler_ccc_0</source_block_id>
+    <source_block_id>rational_resampler_xxx_0</source_block_id>
     <sink_block_id>wxgui_scopesink2_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>e4406a_variable_resampler_ccc_0</source_block_id>
+    <source_block_id>rational_resampler_xxx_0</source_block_id>
     <sink_block_id>wxgui_fftsink2_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>

@@ -33,11 +33,10 @@ link_directories(
 
 list(APPEND e4406a_sources
     E4406A_source_impl.cc
-    variable_resampler_ccc_impl.cc
 )
 
 add_library(gnuradio-e4406a SHARED ${e4406a_sources})
-target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${GNURADIO_FILTER_LIBRARIES} ${LIBVXI11_LIBRARIES})
+target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${LIBVXI11_LIBRARIES})
 set_target_properties(gnuradio-e4406a PROPERTIES DEFINE_SYMBOL "gnuradio_e4406a_EXPORTS")
 
 ########################################################################
@@ -66,7 +65,6 @@ add_executable(test-e4406a ${test_e4406a_sources})
 target_link_libraries(
   test-e4406a
   ${GNURADIO_RUNTIME_LIBRARIES}
-  ${GNURADIO_FILTER_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
   ${LIBVXI11_LIBRARIES}
