@@ -118,51 +118,62 @@ protected:
     char   *d_e4406a_buf;          //!< Buffer for I/Q data block returned by E4406A
     float d_rfgain;                //!< External RF gain
     size_t d_e4406a_bufsize;       //!< Size of buffer used for wave data retrieval from E4406A (:READ:WAV0?)
-    size_t d_e4406a_bufsize_iq;    //!< Size of buffer for I/Q data block returned by E4406A
+    size_t d_e4406a_bufsize_iq;    //!< Size of buffer for I/Q data block for strictly necessary data
     gr::thread::mutex d_e4406a_mutex; //!< E4406A communication protection
 
     /**
      * Send command without argument to instrument utility
      * \param command Command 
+     * \param protect Protect communication with E4406A with the mutex
      */
-    void send_command(const char *command);
+    void send_command(const char *command, bool protect = true);
 
     /**
      * Send command with double argument to instrument utility
      * \param command Command fixed part (prefix)
      * \param value Argument as floating point with double precision value
+     * \param protect Protect communication with E4406A with the mutex
      */
-    void send_command_double(const char *command, double value);
+    void send_command_double(const char *command, double value, bool protect = true);
 
     /**
      * Send command with unsigned integer argument to instrument utility
      * \param command Command fixed part (prefix)
      * \param value Argument as unsigned integer point value
+     * \param protect Protect communication with E4406A with the mutex
      */
-    void send_command_u(const char *command, unsigned int value);
+    void send_command_u(const char *command, unsigned int value, bool protect = true);
 
     /**
      * Send command with unsigned long integer argument to instrument utility
      * \param command Command fixed part (prefix)
      * \param value Argument as unsigned long integer point value
+     * \param protect Protect communication with E4406A with the mutex
      */
-    void send_command_ul(const char *command, unsigned long int value);
+    void send_command_ul(const char *command, unsigned long int value, bool protect = true);
 
     /**
      * Send command and get response from instrument 
      * \param command Command 
      * \param buf Buffer for response
      * \param bufsize Size of response buffer
+     * \param protect Protect communication with E4406A with the mutex
      * \return Number of bytes returned in the response
      */
-    size_t send_command_and_get_response(const char *command, char *buf, const size_t bufsize);
+    size_t send_command_and_get_response(const char *command, 
+            char *buf, 
+            const size_t bufsize, 
+            bool protect = true);
 
     /**
      * Send command and get response from instrument as a double value
      * \param command Command 
      * \param value Pointer to returned value placeholder
+     * \param protect Protect communication with E4406A with the mutex
      */
-    void send_command_and_get_response_double(const char *command, double *value);
+    void send_command_and_get_response_double(const char *command, 
+            double *value, 
+            bool protect = true);
 
     /**
      * Set bandwidth and sweep time

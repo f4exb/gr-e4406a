@@ -3,7 +3,7 @@ This is a GNURadio module to get complex samples from an Agilent E4406A VSA
 You need the libvxi11 library to be installed in your system. See:
 https://github.com/f4exb/libvxi11
 
-The Gnu Radio block requires a recent gnuradio (>= v3.7) to be installed.
+The GNURadio block requires a recent gnuradio (>= v3.7) to be installed.
 
 Please note: prior pulling a new version from git and compiling it,
 please do a "make uninstall" first to properly remove the previous version.
@@ -23,4 +23,10 @@ See INSTALL for a more exotic cmake command involving custom locations for
 libvxi11 and GNURadio. You do not need to install with sudo if this is in a 
 location your user has access to (this is my preferred solution). 
 
+GNURadio blocks implemented (by GRC name):
 
+* E4406A source:
+Basic control and I/Q samples retrieval from an Agilent E4406A VSA over the 
+LAN using VXI-11 protocol. 
+
+See examples/README for information on the examples.

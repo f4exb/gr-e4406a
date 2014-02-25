@@ -5,9 +5,9 @@
 ###################################################
  -->
 <block>
-  <name>simple_decimator_cc</name>
+  <name>Simple Decimator</name>
   <key>e4406a_simple_decimator_cc</key>
-  <category>e4406a</category>
+  <category>E4406A</category>
   <import>import e4406a</import>
   <make>e4406a.simple_decimator_cc($decim)</make>
   <callback>set_decim($decim)</callback>

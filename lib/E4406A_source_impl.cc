@@ -53,6 +53,8 @@ E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr,
     d_resbw(resbw),
     d_nb_points(nb_points),
     d_ip_addr(ip_addr),
+    d_e4406a_buf(0),
+    d_e4406a_bufsize(0),
     d_rfgain(rfgain)
 {
     const size_t MAXSIZE = 256;
@@ -75,12 +77,6 @@ E4406A_source_impl::E4406A_source_impl(const std::string& ip_addr,
     set_frequency(d_frequency); // set central frequency
     set_bandwidth_and_sweep_time(); // set resolution bandwidth and sweep time
     set_rfgain(d_rfgain); // set RF Gain
-
-    gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of E4406A I/Q block size
-    
-    d_e4406a_bufsize_iq = d_nb_points*8;               // I/Q samples buffer size
-    d_e4406a_bufsize = d_e4406a_bufsize_iq*2;          // waveform buffer size to dialog with E4406A
-    d_e4406a_buf = (char *) malloc(d_e4406a_bufsize); // allocate memory for I/Q block returned by E4406A
 }
 
 // ================================================================================================
@@ -93,7 +89,10 @@ E4406A_source_impl::~E4406A_source_impl()
     
     vxi11_close_device(d_ip_addr.c_str(), &d_vxi_link); // close VXI-11 communication link with E4406A
     
-    free(d_e4406a_buf); // release E4406A I/Q buffer
+    if (d_e4406a_buf)
+    {
+        free(d_e4406a_buf); // release E4406A I/Q buffer
+    }
 }
 
 // ================================================================================================
@@ -169,12 +168,17 @@ int E4406A_source_impl::work(int noutput_items,
 }
 
 // ================================================================================================
-void E4406A_source_impl::send_command(const char *command)
+void E4406A_source_impl::send_command(const char *command, bool protect)
 {
     int ret;
-    
+ 
+    if (protect)
     {
         gr::thread::scoped_lock guard(d_e4406a_mutex); // protect communication with E4406A
+        ret = vxi11_send(&d_vxi_link, command);
+    }
+    else
+    {
         ret = vxi11_send(&d_vxi_link, command);
     }
     
@@ -186,38 +190,47 @@ void E4406A_source_impl::send_command(const char *command)
 }
 
 // ================================================================================================
-void E4406A_source_impl::send_command_double(const char *command, double value)
+void E4406A_source_impl::send_command_double(const char *command, double value, bool protect)
 {    char cmd[64];
     
     sprintf(cmd, "%s %.6lf", command, value);
-    send_command(cmd);
+    send_command(cmd, protect);
 }
 
 // ================================================================================================
-void E4406A_source_impl::send_command_u(const char *command, unsigned int value)
+void E4406A_source_impl::send_command_u(const char *command, unsigned int value, bool protect)
 {
     char cmd[64];
     
     sprintf(cmd, "%s %u", command, value);
-    send_command(cmd);
+    send_command(cmd, protect);
 }
 
 // ================================================================================================
-void E4406A_source_impl::send_command_ul(const char *command, unsigned long int value)
+void E4406A_source_impl::send_command_ul(const char *command, unsigned long int value, bool protect)
 {
     char cmd[64];
     
     sprintf(cmd, "%s %lu", command, value);
-    send_command(cmd);
+    send_command(cmd, protect);
 }
 
 // ================================================================================================
-size_t E4406A_source_impl::send_command_and_get_response(const char *command, char *buf, const size_t bufsize)
+size_t E4406A_source_impl::send_command_and_get_response(const char *command, 
+        char *buf, 
+        const size_t bufsize, 
+        bool protect)
 {
     int ret, bytes_returned;
     
+    if (protect)
     {
         gr::thread::scoped_lock guard(d_e4406a_mutex); // protect communication with E4406A
+        ret = vxi11_send(&d_vxi_link, command);
+        bytes_returned = vxi11_receive(&d_vxi_link, buf, bufsize);
+    }
+    else
+    {
         ret = vxi11_send(&d_vxi_link, command);
         bytes_returned = vxi11_receive(&d_vxi_link, buf, bufsize);
     }
@@ -239,12 +252,14 @@ size_t E4406A_source_impl::send_command_and_get_response(const char *command, ch
 }
 
 // ================================================================================================
-void E4406A_source_impl::send_command_and_get_response_double(const char *command, double *value)
+void E4406A_source_impl::send_command_and_get_response_double(const char *command, 
+        double *value, 
+        bool protect)
 {
     const size_t rcvsize = 64;
     char rcv[rcvsize];
     
-    size_t bytes_returned = send_command_and_get_response(command, rcv, rcvsize);
+    size_t bytes_returned = send_command_and_get_response(command, rcv, rcvsize, protect);
     rcv[bytes_returned] = '\0';
     sscanf(rcv, "%lf", value);
 }
@@ -252,24 +267,43 @@ void E4406A_source_impl::send_command_and_get_response_double(const char *comman
 // ================================================================================================
 void E4406A_source_impl::set_bandwidth_and_sweep_time()
 {
-    double value_d;
+    double value_d, sweep_time;
+    gr::thread::scoped_lock guard(d_e4406a_mutex); // protect communication with E4406A for the whole method
     
-    send_command_u(":WAV:BWID", d_resbw); // set resolution bandwidth
-    send_command_and_get_response_double(":WAV:BWID?", &value_d);
+    send_command_u(":WAV:BWID", d_resbw, false); // set resolution bandwidth
+    send_command_and_get_response_double(":WAV:BWID?", &value_d, false);
     d_resbw = value_d; // update with value as set by the instrument
     std::cout << std::endl;
     
-    send_command_and_get_response_double(":WAV:APER?", &d_samp_rate);
-    d_sweep_time = d_samp_rate * (d_nb_points - 1); // add one point to make sure we have enough points in any case
+    send_command_and_get_response_double(":WAV:APER?", &d_samp_rate, false);
+    d_sweep_time = d_samp_rate * (d_nb_points - 1); 
+    send_command_double(":WAV:SWE:TIME", d_sweep_time * 1.01, false); // set sweep time according to required I/Q block size with 1% extra to make sure we always have enough
+    send_command_and_get_response_double(":WAV:SWE:TIME?", &sweep_time, false); // get actual sweep time
+
+    d_e4406a_bufsize_iq = d_nb_points*8;                          // I/Q required samples buffer size
+    size_t new_bufsize = ceil(((sweep_time/d_samp_rate)+1)*8)+16; // new waveform buffer size to dialog with E4406A. 16 bytes provision for fixed header.
+
+    if (new_bufsize > d_e4406a_bufsize) // reallocate buffer only if it has to grow
+    {
+        d_e4406a_bufsize = new_bufsize;
+        
+        if (d_e4406a_buf)
+        {
+            free(d_e4406a_buf);
+        }
+        
+        d_e4406a_buf = (char *) malloc(d_e4406a_bufsize);  // allocate memory for I/Q block returned by E4406A
+    }
+
+    gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of E4406A required I/Q block size
 
     std::cout << "E4406A: Resolution BW " << d_resbw 
               << " Hz, RBW ratio " << d_resbw * d_samp_rate 
               << ", decim " << get_decim() << std::endl;
     std::cout << "E4406A: Effective sample rate " << d_samp_rate << " s" 
               << ", Span decimated " << get_decimated_bw() << " Hz" << std::endl;
-    std::cout << "E4406A: Sweep time set to " << d_sweep_time * 1.01 << " s" << std::endl;
+    std::cout << "E4406A: Sweep time set to " << sweep_time << " s" << std::endl;
     
-    send_command_double(":WAV:SWE:TIME", d_sweep_time * 1.01); // set sweep time according to requested I/Q block size
 }
 
 // ================================================================================================
