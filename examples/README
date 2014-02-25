@@ -2,5 +2,7 @@
 
 test.grc: very basic flowgraph that demonstrates a 4096 point capture each second (no stress!)
 
+remote.grc: simple remote center frequency control of the E4406A
+
 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-    <name>E4406A_remote_control</name>
+    <name>E4406A Remote Control</name>
     <key>e4406a_E4406A_remote_control</key>
     <category>E4406A</category>
     <import>import e4406a</import>

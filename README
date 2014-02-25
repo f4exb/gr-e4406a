@@ -29,4 +29,9 @@ GNURadio blocks implemented (by GRC name):
 Basic control and I/Q samples retrieval from an Agilent E4406A VSA over the 
 LAN using VXI-11 protocol. 
 
+* E4406A Remote Control
+Simple remote control of the E4406A mainly just to fine tune center frequency
+which is impossible with instrument's knob. It is a dummy source block that
+just output zeroes. Just connect it to a throttle block and a null sink block.
+
 See examples/README for information on the examples.
