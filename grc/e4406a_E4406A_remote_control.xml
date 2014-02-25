@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<block>
+    <name>E4406A_remote_control</name>
+    <key>e4406a_E4406A_remote_control</key>
+    <category>E4406A</category>
+    <import>import e4406a</import>
+    <make>e4406a.E4406A_remote_control($ip_addr, $frequency)</make>
+    <callback>set_frequency($frequency)</callback>
+    <param>
+        <name>IP Address</name>
+        <key>ip_addr</key>
+        <type>string</type>
+    </param>
+    <param>
+        <name>Frequency</name>
+        <key>frequency</key>
+        <value>1e9</value>
+        <type>float</type>
+    </param>
+    <source>
+        <name>out</name>
+        <type>complex</type>
+    </source>
+</block>

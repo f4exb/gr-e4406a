@@ -30,11 +30,10 @@ include_directories(
 link_directories(
     ${Boost_LIBRARY_DIRS}
 )
-
 list(APPEND e4406a_sources
     E4406A_source_impl.cc
     simple_decimator_cc_impl.cc
-)
+    E4406A_remote_control_impl.cc )
 
 add_library(gnuradio-e4406a SHARED ${e4406a_sources})
 target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${LIBVXI11_LIBRARIES})
@@ -59,6 +58,7 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_e4406a_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_e4406a.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_e4406a.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_E4406A_remote_control.cc
 )
 
 add_executable(test-e4406a ${test_e4406a_sources})

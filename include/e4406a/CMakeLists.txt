@@ -23,5 +23,6 @@
 install(FILES
     api.h
     E4406A_source.h
-    simple_decimator_cc.h DESTINATION include/e4406a
+    simple_decimator_cc.h
+    E4406A_remote_control.h DESTINATION include/e4406a
 )

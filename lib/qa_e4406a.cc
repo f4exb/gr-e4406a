@@ -26,11 +26,13 @@
  */
 
 #include "qa_e4406a.h"
+#include "qa_E4406A_remote_control.h"
 
 CppUnit::TestSuite *
 qa_e4406a::suite()
 {
   CppUnit::TestSuite *s = new CppUnit::TestSuite("e4406a");
+  s->addTest(gr::e4406a::qa_E4406A_remote_control::suite());
 
   return s;
 }
