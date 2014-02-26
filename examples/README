@@ -1,8 +1,13 @@
 *** GRC flowgraphs examples ***
 
-test.grc: very basic flowgraph that demonstrates a 4096 point capture each second (no stress!)
+* test.grc: 
+very basic flowgraph that demonstrates a 4096 point capture each second (no stress!)
 
-remote.grc: simple remote center frequency control of the E4406A
+* remote.grc: 
+simple remote center frequency control of the E4406A
+
+* qpsk.grc:
+QPSK constellation visualization
 
 
 
