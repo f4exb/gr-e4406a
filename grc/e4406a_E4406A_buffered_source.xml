@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+## E4406A Buffered Source
+###################################################
+ -->
+<block>
+    <name>E4406A Buffered Source</name>
+    <key>e4406a_E4406A_buffered_source</key>
+    <category>E4406A</category>
+    <import>import e4406a</import>
+    <make>e4406a.E4406A_buffered_source(($ip_addr, $frequency, $resbw, $rfgain, $nb_points, $block_factor)</make>
+    <callback>set_frequency($frequency)</callback>
+    <callback>set_resbw($resbw)</callback>
+    <callback>set_rfgain($rfgain)</callback>
+    <param>
+        <name>ip_addr</name>
+        <key>ip_addr</key>
+        <type>string</type>
+    </param>
+    <param>
+        <name>Frequency</name>
+        <key>frequency</key>
+        <value>1e9</value>
+        <type>float</type>
+    </param>
+    <param>
+        <name>Resbw</name>
+        <key>resbw</key>
+        <value>8e6</value>
+        <type>float</type>
+    </param>
+    <param>
+        <name>RF_gain</name>
+        <key>rfgain</key>
+        <value>0</value>
+        <type>float</type>
+    </param>
+    <param>
+        <name>Nb_points</name>
+        <key>nb_points</key>
+        <value>4096</value>
+        <type>int</type>
+    </param>
+    <param>
+        <name>Block_factor</name>
+        <key>block_factor</key>
+        <value>1</value>
+        <type>int</type>
+    </param>
+    <source>
+        <name>out</name>
+        <type>complex</type>
+    </source>
+</block>

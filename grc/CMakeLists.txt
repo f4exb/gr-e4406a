@@ -19,5 +19,6 @@
 install(FILES
     e4406a_E4406A_source.xml
     e4406a_simple_decimator_cc.xml
-    e4406a_E4406A_remote_control.xml DESTINATION share/gnuradio/grc/blocks
+    e4406a_E4406A_remote_control.xml
+    e4406a_E4406A_buffered_source.xml DESTINATION share/gnuradio/grc/blocks
 )
