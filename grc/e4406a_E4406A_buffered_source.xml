@@ -9,7 +9,7 @@
     <key>e4406a_E4406A_buffered_source</key>
     <category>E4406A</category>
     <import>import e4406a</import>
-    <make>e4406a.E4406A_buffered_source(($ip_addr, $frequency, $resbw, $rfgain, $nb_points, $block_factor)</make>
+    <make>e4406a.E4406A_buffered_source($ip_addr, $frequency, $resbw, $rfgain, $nb_points, $block_factor)</make>
     <callback>set_frequency($frequency)</callback>
     <callback>set_resbw($resbw)</callback>
     <callback>set_rfgain($rfgain)</callback>

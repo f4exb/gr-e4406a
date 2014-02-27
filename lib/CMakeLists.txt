@@ -34,7 +34,8 @@ list(APPEND e4406a_sources
     E4406A_source_impl.cc
     simple_decimator_cc_impl.cc
     E4406A_remote_control_impl.cc
-    E4406A_buffered_source_impl.cc )
+    E4406A_buffered_source_impl.cc
+    dblbuff_pacer_cc_impl.cc )
 
 add_library(gnuradio-e4406a SHARED ${e4406a_sources})
 target_link_libraries(gnuradio-e4406a ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${LIBVXI11_LIBRARIES})

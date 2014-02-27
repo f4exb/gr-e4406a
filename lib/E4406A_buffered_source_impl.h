@@ -122,6 +122,8 @@ protected:
     float d_rfgain;                //!< External RF gain
     size_t d_e4406a_bufsize;       //!< Size of buffer used for wave data retrieval from E4406A (:READ:WAV0?)
     size_t d_e4406a_bufsize_iq;    //!< Size of buffer for I/Q data block for strictly necessary data
+    size_t d_counter_size;         //!< Size of block counter returned by E4406A
+    bool d_init;                   //!< Initial block fetch from E4406A
     gr::thread::mutex d_e4406a_mutex; //!< E4406A communication protection
 
     /**

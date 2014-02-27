@@ -59,7 +59,9 @@ E4406A_buffered_source_impl::E4406A_buffered_source_impl(const std::string& ip_a
     d_ip_addr(ip_addr),
     d_e4406a_buf(0),
     d_e4406a_bufsize(0),
-    d_rfgain(rfgain)
+    d_rfgain(rfgain),
+    d_counter_size(0),
+    d_init(true)
 {
     const size_t MAXSIZE = 256;
     char rcv[MAXSIZE];
@@ -105,12 +107,12 @@ int E4406A_buffered_source_impl::work(int noutput_items,
         gr_vector_void_star &output_items)
 {
     gr_complex *out = (gr_complex *) output_items[0];
-    unsigned int counter_size;
 
     // If buffer exhausted then fetch data from E4406A
 
-    if (d_block_index == d_block_factor) 
+    if ((d_block_index == d_block_factor) || d_init)
     {
+        std::cerr << "Fetch..." << std::endl;
         size_t bytes_returned = send_command_and_get_response(":READ:WAV0?", d_e4406a_buf, d_e4406a_bufsize);
         
         if (bytes_returned < 2)
@@ -131,23 +133,23 @@ int E4406A_buffered_source_impl::work(int noutput_items,
             strncpy(counter_str, &d_e4406a_buf[1], 1);
             counter_str[1] = '\0';
             
-            counter_size = strtoul(counter_str, 0, 10);
+            d_counter_size = strtoul(counter_str, 0, 10);
             
-            if (bytes_returned < 2+counter_size)
+            if (bytes_returned < 2 + d_counter_size)
             {
                 std::cerr << "E4406A: I/Q data size less than header data size (" << bytes_returned << " bytes)" << std::endl;
                 throw std::runtime_error("invalid size for I/Q data");
             }
             else
             {
-                strncpy(counter_str, &d_e4406a_buf[2], counter_size);
-                counter_str[counter_size] = '\0';
+                strncpy(counter_str, &d_e4406a_buf[2], d_counter_size);
+                counter_str[d_counter_size] = '\0';
                 
                 unsigned int  byte_count = strtoul(counter_str, 0, 10);
                 
-                if (bytes_returned < 2+counter_size+byte_count)
+                if (bytes_returned < 2 + d_counter_size + byte_count)
                 {
-                    std::cerr << "E4406A: I/Q data block truncated to " << bytes_returned-2-counter_size << " bytes" << std::endl;
+                    std::cerr << "E4406A: I/Q data block truncated to " << bytes_returned - 2 - d_counter_size << " bytes" << std::endl;
                     throw std::runtime_error("invalid size for I/Q data");
                 }
                 else if (byte_count < d_e4406a_bufsize_iq)
@@ -158,14 +160,18 @@ int E4406A_buffered_source_impl::work(int noutput_items,
                 else
                 {
                     d_block_index = 0;
+                    //std::cerr << "Block index reset" << std::endl;
                 }
             }
         }
+        
+        d_init = false;
     }
 
     // send current atomic block
+    //std::cerr << "Try to send block at index " << d_block_index << " @ " << 2 + counter_size + (d_block_index*d_nb_points*8) << std::endl;
 
-    float *iq_array = (float *) &d_e4406a_buf[2 + counter_size + (d_block_index*d_nb_points*8)];
+    float *iq_array = (float *) &d_e4406a_buf[2 + d_counter_size + (d_block_index*d_nb_points*8)];
     
     for (unsigned int i=0; i<d_nb_points; i++)
     {
@@ -176,6 +182,8 @@ int E4406A_buffered_source_impl::work(int noutput_items,
     d_block_index++;
     noutput_items = d_nb_points;
 
+    //std::cerr << "Block sent" << std::endl;
+    
     // Tell runtime system how many output items we produced.
     return noutput_items;
 }
@@ -289,12 +297,14 @@ void E4406A_buffered_source_impl::set_bandwidth_and_sweep_time()
     std::cout << std::endl;
     
     send_command_and_get_response_double(":WAV:APER?", &d_samp_rate, false);
-    d_sweep_time = d_samp_rate * (d_nb_points - 1)*d_block_factor; 
+    d_sweep_time = d_samp_rate * (d_nb_points - 1) * d_block_factor; 
+    
     send_command_double(":WAV:SWE:TIME", d_sweep_time * 1.01, false); // set sweep time according to required I/Q block size with 1% extra to make sure we always have enough
     send_command_and_get_response_double(":WAV:SWE:TIME?", &sweep_time, false); // get actual sweep time
 
-    d_e4406a_bufsize_iq = d_nb_points*8*d_block_factor;           // I/Q required samples buffer size
-    size_t new_bufsize = ceil(((sweep_time/d_samp_rate)+1)*8*d_block_factor)+16; // new waveform buffer size to dialog with E4406A. 16 bytes provision for fixed header.
+    d_e4406a_bufsize_iq = d_nb_points * 8 * d_block_factor;       // I/Q required samples buffer size
+    size_t actual_nb_points = ((sweep_time/d_samp_rate)+2);
+    size_t new_bufsize = ceil(actual_nb_points*8)+16; // new waveform buffer size to dialog with E4406A. 16 bytes provision for fixed header.
 
     if (new_bufsize > d_e4406a_bufsize) // reallocate buffer only if it has to grow
     {
@@ -306,17 +316,17 @@ void E4406A_buffered_source_impl::set_bandwidth_and_sweep_time()
         }
         
         d_e4406a_buf = (char *) malloc(d_e4406a_bufsize);  // allocate memory for I/Q block returned by E4406A
+        std::cerr << "Allocated " << d_e4406a_bufsize << " bytes" << std::endl;
     }
 
-    gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of required I/Q atomic block size
-    d_block_index = 0; // Reset index to start of buffer
+    gr::block::set_output_multiple(d_nb_points); // make sure noutput_items will be a multiple of E4406A required I/Q block size
 
     std::cout << "E4406A: Resolution BW " << d_resbw 
               << " Hz, RBW ratio " << d_resbw * d_samp_rate 
               << ", decim " << get_decim() << std::endl;
     std::cout << "E4406A: Effective sample rate " << d_samp_rate << " s" 
               << ", Span decimated " << get_decimated_bw() << " Hz" << std::endl;
-    std::cout << "E4406A: Sweep time set to " << sweep_time << " s" << std::endl;
+    std::cout << "E4406A: Sweep time set to " << sweep_time << " s, " << actual_nb_points << " points" << std::endl;
 }
 
 // ================================================================================================

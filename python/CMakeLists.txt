@@ -45,3 +45,4 @@ GR_ADD_TEST(qa_E4406A_source ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa
 GR_ADD_TEST(qa_E4406A_remote_control ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_E4406A_remote_control.py)
 GR_ADD_TEST(qa_simple_decimator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_simple_decimator_cc.py)
 GR_ADD_TEST(qa_E4406A_buffered_source ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_E4406A_buffered_source.py)
+GR_ADD_TEST(qa_dblbuff_pacer_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dblbuff_pacer_cc.py)

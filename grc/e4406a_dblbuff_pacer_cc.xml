@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+## Double buffered pacing block
+###################################################
+ -->
+<block>
+    <name>Double Buffered Pacer</name>
+    <key>e4406a_dblbuff_pacer_cc</key>
+    <category>E4406A</category>
+    <import>import e4406a</import>
+    <make>e4406a.dblbuff_pacer_cc($out_size, $block_factor)</make>
+    <param>
+        <name>out_size</name>
+        <key>out_size</key>
+        <type>int</type>
+    </param>
+    <param>
+        <name>block_factor</name>
+        <key>block_factor</key>
+        <value>1</value>
+        <type>int</type>
+    </param>
+    <sink>
+        <name>in</name>
+        <type>complex</type>
+    </sink>
+    <source>
+        <name>out</name>
+        <type>complex</type>
+    </source>
+</block>

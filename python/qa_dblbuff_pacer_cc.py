@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import e4406a_swig as e4406a
 
-class qa_E4406A_buffered_source (gr_unittest.TestCase):
+class qa_dblbuff_pacer_cc (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,22 +32,19 @@ class qa_E4406A_buffered_source (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        # set up fg
-        block_factor = 4
-        vsa = e4406a.E4406A_buffered_source("192.168.0.101", 1000000000, 8000000, 0, 4096, 4)
-        head = blocks.head(gr.sizeof_gr_complex*1, 4096*4)
+        src = blocks.null_source(gr.sizeof_gr_complex*1)
+        pacer = e4406a.dblbuff_pacer_cc(128, 4)
+        head = blocks.head(gr.sizeof_gr_complex*1, 128*4*2)
         dst = blocks.vector_sink_c()
-        self.tb.connect(vsa, head)
+        # set up fg
+        self.tb.connect(src, pacer)
+        self.tb.connect(pacer, head)
         self.tb.connect(head, dst)
         self.tb.run ()
-
         # check data
         result_data = dst.data()
-
-        print "# result I/Q points:", len(result_data) 
-
-        self.assertEqual(len(result_data), 4096*4)
-
+        print "# result points:", len(result_data) 
+        self.assertEqual(len(result_data), 128*4*2)
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_E4406A_buffered_source, "qa_E4406A_buffered_source.xml")
+    gr_unittest.run(qa_dblbuff_pacer_cc, "qa_dblbuff_pacer_cc.xml")

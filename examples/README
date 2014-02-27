@@ -7,7 +7,18 @@ very basic flowgraph that demonstrates a 4096 point capture each second (no stre
 simple remote center frequency control of the E4406A
 
 * qpsk.grc:
-QPSK constellation visualization
+QPSK constellation visualization using QT GUI using the plain E4406A source block.
+Because of choppiness in the samples flow it can be difficult to visualize constellation 
+when data is random.
+
+* qpsk2_wx.grc:
+Uses E4406A buffered source with WX GUI. It retains QT GUI blocks as disabled blocks
+so it can be easily reverted to QT GUI. Allows to visualize better constellations 
+modulated with random data.
+
+* qpsk3.grc:
+Uses the double buffered pacer to give smoother experience! Uses QT GUI with QX GUI
+blocks disabled. It gives a real time feeling.
 
 
 
