@@ -28,20 +28,23 @@ GNURadio blocks implemented (by GRC name):
 * E4406A source:
 Basic control and I/Q samples retrieval from an Agilent E4406A VSA over the 
 LAN using VXI-11 protocol. 
+See examples/qpsk.grc for an flowgraph using this block.
 
 * E4406A Remote Control
 Simple remote control of the E4406A mainly just to fine tune center frequency
 which is impossible with instrument's knob. It is a dummy source block that
 just output zeroes. Just connect it to a throttle block and a null sink block.
+See examples/remote.grc for a flowgraph using this block.
 
 * E4406A Buffered source
 Similar as E4406A source but buferrizes a number of times the required output
 block size before sending the blocks one at a time as requested by the 
-scheduler. It implies that a communication with the E4406A each time the 
-buffer gets empty hence the rythm of the flow is highly discontinuous. To 
+scheduler. It implies that a communication with the E4406A is initiaed each time 
+the buffer gets empty hence the rythm of the flow is highly discontinuous. To 
 improve smoothness see "Double buffered pacer" next. The advantage in using 
 this block is to have more contiguous blocks (or less discontinuities in the flow)
 resulting in better behaviour of the subsequent blocks.
+See examples/qpsk2_wx.grc for a flowgraph using this block.
 
 * Double buffered pacer
 Takes a large amount of data in input to serve it in smaller chunks at the 
@@ -50,6 +53,7 @@ block can run in parallel with it. When connected to a "E4406A source" block
 of a larger size than the requested block size at the output it results in 
 a smoother flow giving a real time impression. It also retains the advantage
 to have more contiguous blocks (or less discontinuities in the flow).
+See examples/qpsk3.grc for a flowgraph using this block.
 
 
 See examples/README for information on the examples.
