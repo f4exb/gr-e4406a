@@ -60,7 +60,6 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_e4406a_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_e4406a.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_e4406a.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_E4406A_remote_control.cc
 )
 
 add_executable(test-e4406a ${test_e4406a_sources})

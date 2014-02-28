@@ -26,7 +26,6 @@
  */
 
 #include "qa_e4406a.h"
-#include "qa_E4406A_remote_control.h"
 
 CppUnit::TestSuite *
 qa_e4406a::suite()
